@@ -65,9 +65,9 @@ protected inductive RecursiveIn (O : Set (ℕ →. ℕ)) : (ℕ →. ℕ) → Pr
   | right : Nat.RecursiveIn O (PFun.lift fun n => (Nat.unpair n).2)
   | oracle : ∀ g ∈ O, Nat.RecursiveIn O g
   | pair {f h : ℕ →. ℕ} (hf : Nat.RecursiveIn O f) (hh : Nat.RecursiveIn O h) :
-      Nat.RecursiveIn O (PFun.mk fun n => (Nat.pair <$> f n <*> h n))
+      Nat.RecursiveIn O fun n => Nat.pair <$> f n <*> h n
   | comp {f h : ℕ →. ℕ} (hf : Nat.RecursiveIn O f) (hh : Nat.RecursiveIn O h) :
-      Nat.RecursiveIn O (PFun.mk fun n => h n >>= f)
+      Nat.RecursiveIn O fun n => h n >>= f
   | prec {f h : ℕ →. ℕ} (hf : Nat.RecursiveIn O f) (hh : Nat.RecursiveIn O h) :
       Nat.RecursiveIn O (PFun.mk <| Nat.unpaired fun a n =>
         n.rec (f a) fun y IH => do
@@ -82,7 +82,7 @@ end Nat
 /-- A partial function `f : α →. σ` between `Primcodable` types is recursive in a set of oracles
 `O` if its encoding as a function `ℕ →. ℕ` is `Nat.RecursiveIn O`. -/
 def RecursiveIn {α σ} [Primcodable α] [Primcodable σ] (O : Set (ℕ →. ℕ)) (f : α →. σ) : Prop :=
-  Nat.RecursiveIn O (PFun.mk fun n => Part.bind (decode (α := α) n) fun a => (f a).map encode)
+  Nat.RecursiveIn O fun n => Part.bind (decode (α := α) n) fun a => (f a).map encode
 
 lemma RecursiveIn.iff_nat {f : ℕ →. ℕ} {O} : RecursiveIn O f ↔ Nat.RecursiveIn O f := by
   simp [RecursiveIn, Part.map_id']
@@ -107,7 +107,7 @@ variable {f g : ℕ →. ℕ}
 
 theorem of_eq {O} (hf : Nat.RecursiveIn O f) (H : ∀ n, f n = g n) :
     Nat.RecursiveIn O g :=
-  (DFunLike.ext _ _ H : f = g) ▸ hf
+  (PFun.ext_apply H : f = g) ▸ hf
 
 theorem of_eq_tot {g : ℕ → ℕ} {O} (hf : Nat.RecursiveIn O f)
     (H : ∀ n, g n ∈ f n) : Nat.RecursiveIn O g :=
@@ -185,7 +185,7 @@ namespace RecursiveIn
 
 lemma of_eq {f g : α →. σ} (hf : RecursiveIn O f)
     (H : ∀ x, f x = g x) : RecursiveIn O g :=
-  (DFunLike.ext _ _ H : f = g) ▸ hf
+  (PFun.ext_apply H : f = g) ▸ hf
 
 lemma of_eq_tot {f : α →. σ} {g : α → σ}
     (hf : RecursiveIn O f) (H : ∀ n, g n ∈ f n) : RecursiveIn O (g : α →. σ) :=

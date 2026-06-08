@@ -29,8 +29,8 @@ theorem merge' {f g} (hf : Nat.Partrec f) (hg : Nat.Partrec g) :
       ∀ a, (∀ x ∈ h a, x ∈ f a ∨ x ∈ g a) ∧ ((h a).Dom ↔ (f a).Dom ∨ (g a).Dom) := by
   obtain ⟨cf, rfl⟩ := Code.exists_code.1 hf
   obtain ⟨cg, rfl⟩ := Code.exists_code.1 hg
-  have h_partrec : Nat.Partrec (PFun.mk fun n => Nat.rfindOpt fun k =>
-      cf.evaln k n <|> cg.evaln k n) :=
+  have h_partrec : Nat.Partrec fun n => Nat.rfindOpt fun k =>
+      cf.evaln k n <|> cg.evaln k n :=
     Partrec.nat_iff.1
       (Partrec.rfindOpt <|
         (Primrec.option_orElse.to_comp.comp
@@ -44,7 +44,7 @@ theorem merge' {f g} (hf : Nat.Partrec f) (hg : Nat.Partrec g) :
     rw [Option.mem_def, Option.orElse_eq_some, ← Option.mem_def, ← Option.mem_def] at e
     obtain e | ⟨-, e⟩ := e <;> simp [Code.evaln_sound e]
   refine ⟨h_mem, fun h ↦ (h_mem _ ⟨h, rfl⟩).imp Exists.fst Exists.fst, fun h ↦ ?_⟩
-  simp only [PFun.mk_apply]
+  simp only [PFun.ofFun_apply]
   rw [Nat.rfindOpt_dom]
   simp only [dom_iff_mem, Code.evaln_complete, Option.mem_def] at h
   obtain ⟨x, k, e⟩ | ⟨x, k, e⟩ := h
@@ -71,13 +71,14 @@ theorem merge' {f g : α →. σ} (hf : Partrec f) (hg : Partrec g) :
     ∃ k : α →. σ,
       Partrec k ∧ ∀ a, (∀ x ∈ k a, x ∈ f a ∨ x ∈ g a) ∧ ((k a).Dom ↔ (f a).Dom ∨ (g a).Dom) := by
   let ⟨k, hk, H⟩ := Nat.Partrec.merge' (bind_decode₂_iff.1 hf) (bind_decode₂_iff.1 hg)
-  let k' : α →. σ := PFun.mk fun a => (k (encode a)).bind fun n => (decode (α := σ) n : Part σ)
+  let k' : α →. σ := PFun.ofFun fun a =>
+    (k (encode a)).bind fun n => (decode (α := σ) n : Part σ)
   refine
     ⟨k', ((nat_iff.2 hk).comp Computable.encode).bind (Computable.decode.ofOption.comp snd).to₂,
       fun a => ?_⟩
   have : ∀ x ∈ k' a, x ∈ f a ∨ x ∈ g a := by
     intro x h'
-    simp only [k', PFun.mk_apply, mem_bind_iff] at h'
+    simp only [k', PFun.ofFun_apply, mem_bind_iff] at h'
     obtain ⟨n, hn, hx⟩ := h'
     have h_split := (H (encode a)).1 n hn
     simp only [PFun.mk_apply, decode₂_encode, coe_some, Part.bind_some, Part.mem_map_iff] at h_split
@@ -90,10 +91,10 @@ theorem merge' {f g : α →. σ} (hf : Partrec f) (hg : Partrec g) :
       exact Or.inr ha
   refine ⟨this, ⟨fun h => (this _ ⟨h, rfl⟩).imp Exists.fst Exists.fst, ?_⟩⟩
   intro h
-  simp only [k', PFun.mk_apply, bind_dom]
+  simp only [k', PFun.ofFun_apply, bind_dom]
   have hk_dom : (k (encode a)).Dom := by
     apply (H (encode a)).2.mpr
-    simpa [PFun.mk_apply, decode₂_encode, Part.bind_some] using h
+    simpa [PFun.ofFun_apply, decode₂_encode, Part.bind_some] using h
   exists hk_dom
   have h_mem := (H (encode a)).1 _ ⟨hk_dom, rfl⟩
   simp only [PFun.mk_apply, decode₂_encode, coe_some, Part.bind_some, Part.mem_map_iff] at h_mem
@@ -187,7 +188,7 @@ lemma find {α : Type*} [Primcodable α] {P : α → ℕ → Prop} [DecidableRel
     (hP_comp : ComputablePred (fun p : α × ℕ => P p.1 p.2)) (hP_ex : ∀ x, ∃ n, P x n) :
     Computable (fun x => Nat.find (hP_ex x)) := by
   have hP_decide : Computable₂ (fun x n => decide (P x n)) := hP_comp.decide
-  have h : Partrec (PFun.mk fun x ↦ Nat.rfind (PFun.mk fun n => Part.some (decide (P x n)))) :=
+  have h : Partrec (PFun.mk fun x ↦ Nat.rfind fun n => Part.some (decide (P x n))) :=
     Partrec.rfind hP_decide.partrec₂
   refine h.of_eq_tot fun x ↦ ?_
   simp +contextual [Nat.find_spec]

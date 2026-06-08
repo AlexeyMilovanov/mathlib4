@@ -87,6 +87,23 @@ initialize_simps_projections PFun (toFun → apply)
 
 @[simp] theorem mk_coe (f : α →. β) : PFun.mk ⇑f = f := by cases f; rfl
 
+/-- Bundle a function `α → Part β` as a partial function `α →. β`. Synonym for `PFun.mk`,
+provided to make coercion sites read more naturally. -/
+@[coe] protected def ofFun (f : α → Part β) : α →. β := PFun.mk f
+
+/-- A function `α → Part β` may be regarded as a partial function `α →. β`. -/
+instance : Coe (α → Part β) (α →. β) := ⟨PFun.ofFun⟩
+
+@[simp] theorem coe_ofFun (f : α → Part β) : ⇑(PFun.ofFun f) = f := rfl
+
+@[simp] theorem ofFun_apply (f : α → Part β) (x : α) : PFun.ofFun f x = f x := rfl
+
+@[simp] theorem ofFun_coe (f : α →. β) : PFun.ofFun ⇑f = f := by cases f; rfl
+
+/-- Pointwise extensionality: two partial functions are equal when they agree as functions
+to `Part β`. This is `DFunLike.ext` repackaged with the `PFun` name. -/
+theorem ext_apply {f g : α →. β} (H : ∀ a, f a = g a) : f = g := DFunLike.ext f g H
+
 /-- The domain of a partial function -/
 def Dom (f : α →. β) : Set α :=
   {a | (f a).Dom}

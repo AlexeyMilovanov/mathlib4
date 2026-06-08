@@ -55,7 +55,7 @@ theorem to_part {n f} (pf : @Partrec' n f) : Partrec f := by
 
 theorem of_eq {n} {f g : List.Vector ℕ n →. ℕ} (hf : Partrec' f) (H : ∀ i, f i = g i) :
     Partrec' g :=
-  (DFunLike.ext _ _ H : f = g) ▸ hf
+  (PFun.ext_apply H : f = g) ▸ hf
 
 theorem of_prim {n} {f : List.Vector ℕ n → ℕ} (hf : Primrec f) : @Partrec' n f :=
   prim (Nat.Primrec'.of_prim hf)
