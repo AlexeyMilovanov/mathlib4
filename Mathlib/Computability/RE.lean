@@ -34,8 +34,8 @@ theorem merge' {f g} (hf : Nat.Partrec f) (hg : Nat.Partrec g) :
     Partrec.nat_iff.1
       (Partrec.rfindOpt <|
         Primrec.option_orElse.to_comp.comp
-          (Code.primrec_evaln.to_comp.comp <| (snd.pair (const cf)).pair fst)
-          (Code.primrec_evaln.to_comp.comp <| (snd.pair (const cg)).pair fst))
+          ((Code.primrec_evaln.to_comp.comp <| (snd.pair (const cf)).pair fst).of_eq fun _ => rfl)
+          ((Code.primrec_evaln.to_comp.comp <| (snd.pair (const cg)).pair fst).of_eq fun _ => rfl))
   refine ⟨_, h_partrec, fun n => ?_⟩
   have h_mem : ∀ x ∈ Nat.rfindOpt fun k ↦ Code.evaln k cf n <|> Code.evaln k cg n,
       x ∈ Code.eval cf n ∨ x ∈ Code.eval cg n := by

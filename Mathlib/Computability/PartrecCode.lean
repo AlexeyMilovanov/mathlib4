@@ -552,8 +552,7 @@ theorem exists_code {f : ℕ →. ℕ} : Nat.Partrec f ↔ ∃ c : Code, eval c 
       exact ⟨prec cf cg, rfl⟩
     | rfind pf hf =>
       rcases hf with ⟨cf, rfl⟩
-      refine ⟨comp (rfind' cf) (pair Code.id zero), ?_⟩
-      ext n
+      refine ⟨comp (rfind' cf) (pair Code.id zero), DFunLike.ext _ _ fun n => ?_⟩
       simp [eval, Seq.seq, add_zero, Part.map_id']
   · rintro ⟨c, rfl⟩
     induction c with
@@ -1033,8 +1032,8 @@ theorem fixed_point {f : Code → Code} (hf : Computable f) : ∃ c : Code, eval
   let g : ℕ → ℕ →. ℕ := fun x => fun y ↦.
     eval (ofNat Code x) x >>= fun b => eval (ofNat Code b) y
   have : Partrec₂ g :=
-    (eval_part.comp ((Computable.ofNat _).comp fst) fst).bind
-      (eval_part.comp ((Computable.ofNat _).comp snd) (snd.comp fst)).to₂
+    ((eval_part.comp ((Computable.ofNat _).comp fst) fst).bind
+      (eval_part.comp ((Computable.ofNat _).comp snd) (snd.comp fst)).to₂).of_eq fun _ => rfl
   let ⟨cg, eg⟩ := exists_code.1 this
   have eg' : ∀ a n, eval cg (Nat.pair a n) = Part.map encode (g a n) := by simp [eg]
   let F (x : ℕ) : Code := f (curry cg x)

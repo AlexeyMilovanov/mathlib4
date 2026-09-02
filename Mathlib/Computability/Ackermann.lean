@@ -387,8 +387,7 @@ theorem _root_.computable₂_ack : Computable₂ ack := by
   apply _root_.Partrec.of_eq_tot
     (f := fun p : ℕ × ℕ ↦. (pappAck p.1).eval p.2) (g := fun p : ℕ × ℕ => ack p.1 p.2)
   · change Partrec₂ (fun m => (pappAck m).eval)
-    apply_rules only
-      [Code.eval_part.comp₂, Computable.fst, Computable.snd, primrec_pappAck.to_comp.comp]
+    exact Code.eval_part.comp₂ (primrec_pappAck.to_comp.comp Computable.fst) Computable.snd
   · simp
 
 end Nat.Partrec.Code
