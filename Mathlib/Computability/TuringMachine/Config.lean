@@ -522,7 +522,6 @@ def Cont.then : Cont → Cont → Cont
   | Cont.comp f k => fun k' => Cont.comp f (k.then k')
   | Cont.fix f k => fun k' => Cont.fix f (k.then k')
 
-set_option backward.isDefEq.respectTransparency false in
 theorem Cont.then_eval {k k' : Cont} {v} : (k.then k').eval v = k.eval v >>= k'.eval := by
   induction k generalizing v with
   | halt => simp only [Cont.eval, Cont.then, PFun.id_apply, Part.bind_eq_bind, Part.bind_some]
@@ -671,7 +670,6 @@ theorem cont_eval_fix {f k v} (fok : Code.Ok f) :
       rw [stepRet, ite_eq_right h]
       exact IH v₁.tail ((Part.mem_map_iff _).2 ⟨_, he₁, ite_eq_right h⟩)
 
-set_option backward.isDefEq.respectTransparency false in
 theorem code_is_ok (c) : Code.Ok c := by
   induction c with (intro k v; rw [stepNormal])
   | cons f fs IHf IHfs =>
@@ -698,7 +696,6 @@ theorem code_is_ok (c) : Code.Ok c := by
 theorem stepNormal_eval (c v) : eval step (stepNormal c Cont.halt v) = Cfg.halt <$> c.eval v :=
   (code_is_ok c).zero
 
-set_option backward.isDefEq.respectTransparency false in
 theorem stepRet_eval {k v} : eval step (stepRet k v) = Cfg.halt <$> k.eval v := by
   induction k generalizing v with
   | halt =>

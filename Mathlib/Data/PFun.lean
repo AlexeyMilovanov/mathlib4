@@ -514,17 +514,14 @@ def comp (f : β →. γ) (g : α →. β) : α →. γ := fun a ↦. (g a).bind
 theorem comp_apply (f : β →. γ) (g : α →. β) (a : α) : f.comp g a = (g a).bind f :=
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem id_comp (f : α →. β) : (PFun.id β).comp f = f :=
   ext fun _ _ => by simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem comp_id (f : α →. β) : f.comp (PFun.id α) = f :=
   ext fun _ _ => by simp
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem dom_comp (f : β →. γ) (g : α →. β) : (f.comp g).Dom = g.preimage f.Dom := by
   ext
@@ -546,7 +543,6 @@ theorem Part.bind_comp (f : β →. γ) (g : α →. β) (a : Part α) :
 theorem comp_assoc (f : γ →. δ) (g : β →. γ) (h : α →. β) : (f.comp g).comp h = f.comp (g.comp h) :=
   ext fun _ _ => by simp only [comp_apply, Part.bind_comp]
 
-set_option backward.isDefEq.respectTransparency false in
 -- This can't be `simp`
 theorem coe_comp (g : β → γ) (f : α → β) : ((g ∘ f : α → γ) : α →. γ) = (g : β →. γ).comp f :=
   ext fun _ _ => by simp only [coe_val, comp_apply, Function.comp, Part.bind_some]
@@ -599,7 +595,6 @@ theorem mem_prodMap {f : α →. γ} {g : β →. δ} {x : α × β} {y : γ × 
   · simp only [prodMap_apply, Part.mem_mk_iff, And.exists, Prod.ext_iff]
   · simp only [exists_and_left, exists_and_right, Membership.mem, Part.Mem]
 
-set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem prodLift_fst_comp_snd_comp (f : α →. γ) (g : β →. δ) :
     prodLift (f.comp ((Prod.fst : α × β → α) : α × β →. α))

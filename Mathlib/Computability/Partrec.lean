@@ -179,7 +179,6 @@ theorem of_eq_tot {f : ℕ →. ℕ} {g : ℕ → ℕ} (hf : Nat.Partrec f) (H :
     Nat.Partrec g :=
   hf.of_eq fun n => eq_some_iff.2 (H n)
 
-set_option backward.isDefEq.respectTransparency false in
 theorem of_primrec {f : ℕ → ℕ} (hf : Nat.Primrec f) : Nat.Partrec f := by
   induction hf with
   | zero => exact zero
@@ -206,7 +205,6 @@ protected theorem id : Nat.Partrec (.id ℕ) :=
 @[deprecated Nat.Partrec.id (since := "2026-07-31")]
 protected alias some := Nat.Partrec.id
 
-set_option backward.isDefEq.respectTransparency false in
 theorem none : Nat.Partrec fun _ ↦. .none :=
   (of_primrec (Nat.Primrec.const 1)).rfind.of_eq fun _ =>
     eq_none_iff.2 fun _ ⟨h, _⟩ => by simp at h
@@ -217,7 +215,6 @@ theorem prec' {f g h} (hf : Nat.Partrec f) (hg : Nat.Partrec g) (hh : Nat.Partre
   ((prec hg hh).comp (pair .id hf)).of_eq fun a =>
     by simp [Seq.seq, Nat.unpaired, PFun.coe_mk]
 
-set_option backward.isDefEq.respectTransparency false in
 theorem ppred : Nat.Partrec fun n ↦. Nat.ppred n :=
   have : Primrec₂ fun n m => if n = Nat.succ m then 0 else 1 :=
     (Primrec.ite
@@ -413,7 +410,6 @@ theorem const' (s : Part σ) : Partrec fun _ : α ↦. s :=
   haveI := Classical.dec s.Dom
   Decidable.Partrec.const' s
 
-set_option backward.isDefEq.respectTransparency false in
 protected theorem bind {f : α →. β} {g : α → β →. σ} (hf : Partrec f) (hg : Partrec₂ g) :
     Partrec fun a ↦. (f a).bind (g a) :=
   (hg.comp (Nat.Partrec.id.pair hf)).of_eq fun n => by
@@ -519,7 +515,6 @@ variable {α : Type*} {σ : Type*} [Primcodable α] [Primcodable σ]
 
 open Computable
 
-set_option backward.isDefEq.respectTransparency false in
 theorem rfind {p : α → ℕ →. Bool} (hp : Partrec₂ p) : Partrec fun a ↦. Nat.rfind (p a) :=
   (Nat.Partrec.rfind <|
         hp.map ((Primrec.dom_bool fun b => cond b 0 1).comp Primrec.snd).to₂.to_comp).of_eq
@@ -587,7 +582,6 @@ variable [Primcodable α] [Primcodable β] [Primcodable γ] [Primcodable σ]
 theorem option_some_iff {f : α → σ} : (Computable fun a => Option.some (f a)) ↔ Computable f :=
   ⟨fun h => encode_iff.1 <| (pred.comp (encode_iff.2 h)).of_eq fun _ => rfl, option_some.comp⟩
 
-set_option backward.isDefEq.respectTransparency false in
 theorem bind_decode_iff {f : α → β → Option σ} :
     (Computable₂ fun a n => (decode (α := β) n).bind (f a)) ↔ Computable₂ f :=
   ⟨fun hf =>
@@ -713,7 +707,6 @@ theorem option_some_iff {f : α →. σ} :
       simp [Part.bind_assoc, bind_some_eq_map],
     fun hf => Partrec.map hf (option_some.comp snd).to₂⟩
 
-set_option backward.isDefEq.respectTransparency false in
 theorem optionCasesOn_right {o : α → Option β} {f : α → σ} {g : α → β →. σ} (ho : Computable o)
     (hf : Computable f) (hg : Partrec₂ g) :
     Partrec fun a ↦. Option.casesOn (o a) (.some (f a)) (g a) :=
@@ -792,7 +785,6 @@ theorem fix_aux {α σ} (f : α →. σ ⊕ α) (a : α) (b : σ) :
       clear_value F
       grind
 
-set_option backward.isDefEq.respectTransparency false in
 theorem fix {f : α →. σ ⊕ α} (hf : Partrec f) : Partrec (PFun.fix f) := by
   let F : α → ℕ →. σ ⊕ α := fun a => fun n ↦.
     n.rec (.some (.inr a))
